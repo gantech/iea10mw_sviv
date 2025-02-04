@@ -1,0 +1,14 @@
+Case setup for forced motion simulations of IEA 10MW
+----------------------------------------------------
+
+
+This case setup is designed for reproducing results from Christian Grinderslev's paper in https://wes.copernicus.org/articles/7/2201/2022/
+
+This will only work on the NREL Kestrel system as of the date of this commit 02/04/2025. No guarantees on this setup working later.
+
+Steps to run this
+
+1. From the top level folder `python utilities/gen_cases.py`
+2. From the top level folder `sbatch run_openfast.slurm`
+3. From the top level fodler `sbatch run_sviv.slurm`
+
