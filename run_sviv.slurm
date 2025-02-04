@@ -34,4 +34,5 @@ export FI_CXI_RX_MATCH_MODE=software
 
 cd `sed -n '${SLURM_ARRAY_TASK_ID}p' list_of_cases`
 cd cfd_run
+cp ../openfast_run/turb_00_output.nc .
 srun -N 7 -n 672 --ntasks-per-node=96 --distribution=block:cyclic $BINDW exawind --nwind 288 --awind 384 iea10mw.yaml &> log_7nodes.out
