@@ -31,7 +31,7 @@ incflo.godunov_type = "ppm"
 transport.viscosity = 1.8e-5
 transport.laminar_prandtl = 0.7
 transport.turbulent_prandtl = 0.3333
-turbulence.model = KOmegaSST
+turbulence.model = KOmegaSSTIDDES
 TKE.source_terms = KwSSTSrc
 SDR.source_terms = SDRSrc
 
