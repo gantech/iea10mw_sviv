@@ -967,7 +967,7 @@ realms:
   name: realm_1
   output:
     output_data_base_name: out01/iea10mw.e
-    output_frequency: 1
+    output_frequency: 100
     output_node_set: false
     output_variables:
     - velocity
@@ -1046,7 +1046,7 @@ realms:
         turbulent_ke: 0.7
         velocity: 0.7
     projected_timescale_type: momentum_diag_inv
-    turbulence_model: sst
+    turbulence_model: sst_iddes
   turbulence_averaging:
     specifications:
     - compute_q_criterion: true
