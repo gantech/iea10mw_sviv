@@ -81,6 +81,8 @@ def gen_case(case_data, template_dir='template', case_dir=None):
     refinement_box_file = Path(template_dir+'/cfd_run/static_box.txt')
     shutil.copy(refinement_box_file, Path(case_dir+'/cfd_run/static_box.txt'))
 
+    return str(case_dir).rstrip('/')
+    
 if __name__=="__main__":
 
     case_list = yaml.load(open('case_list.yaml'), Loader=yaml.UnsafeLoader)['siv_viv_cases']
@@ -93,6 +95,14 @@ if __name__=="__main__":
                            'pitch': float(yc['pitch']),
                            'azimuth': yc['az'],
                            'amplitude': float(amp)} )
+    
+    list_file = 'list_of_cases'
+    if Path(list_file).exists():
+        Path(list_file).unlink()
 
     with Pool(36) as p:
-        p.map(gen_case, cases)
+        case_dirs = p.map(gen_case, cases)
+
+    with open(list_file, 'w') as f:
+        for cd in case_dirs:
+            f.write(cd + '\n')

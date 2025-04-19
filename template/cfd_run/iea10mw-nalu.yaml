@@ -94,7 +94,7 @@ realms:
         exchange_fringe_data: false
         max_iterations: 1
         name: myNDTW
-        update_frequency: 1000000000
+        update_frequency: 1
     - LowMachEOM:
         convergence_tolerance: 1e-8
         max_iterations: 1
@@ -125,7 +125,7 @@ realms:
       value: 1.8e-05
     target_name:
     - blade1-HEX
-  mesh: ../../mesh/iea10mw_blade.exo
+  mesh: /scratch/xuepengfu/iea10mw_grid_testv1/chord_257_span_12/mesh/blade_volume.exo
   mesh_transformation:
   - frame: inertial
     mesh_parts:
@@ -1184,7 +1184,7 @@ realms:
   sideset_writers:
      - name: boundary_output
        output_data_base_name: blades01/blades.exo
-       output_frequency: 10
+       output_frequency: 100
        target_name: [blade1]
        output_variables:
        - pressure
@@ -1194,7 +1194,7 @@ realms:
        - mesh_displacement
   output_on_failed_jacobian_check: true
   post_processing:
-  - frequency: 4
+  - frequency: 1
     output_file_name: forces01.dat
     parameters:
     - 0
