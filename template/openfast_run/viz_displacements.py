@@ -262,7 +262,7 @@ class OpenfastFSI:
         """Find matrix that interpolates from
         finite element nodes to quadrature points"""
 
-        data = yaml.load(open("IEA-10.0-198-RWT.BD1.sum.yaml"), Loader=yaml.Loader)
+        data = yaml.load(open("00_IEA-10.0-198-RWT.BD1.sum.yaml"), Loader=yaml.Loader)
 
         # Node initial position and rotation
         node_x0 = np.array(data['Init_Nodes_E1'])[:,:3]
@@ -380,30 +380,32 @@ class OpenfastFSI:
         #All computations below at FEM nodes - not quadrature points
         init_loc = np.array(data['Init_Nodes_E1'])
 
-        A = np.loadtxt('00_IEA-10.0-198-RWT.1.lin',skiprows=3444,max_rows=120)
+        A = np.loadtxt('00_IEA-10.0-198-RWT.1.lin',skiprows=6567,max_rows=120)
         eigvals, eigvecs = eig(A)
 
-        #First edge mode is at location -2
+        #First edge mode is at location -4
 
         #Get first edge mode scaled to 1m displacement in edge direction
-        edge_mode = np.abs(eigvecs[:60,-2].reshape((10,6))) * 1.0 / np.abs(eigvecs[60-5,-2])
+        edge_mode = np.abs(eigvecs[:60,-4].reshape((10,6))) * 1.0 / np.abs(eigvecs[60-5,-4])
         edge_mode = np.r_[np.zeros((1,6)), edge_mode]
 
-        edge_mode_phase = np.angle(eigvecs[:60,-2].reshape((10,6)))
+        edge_mode_phase = np.angle(eigvecs[:60,-4].reshape((10,6)))
         edge_mode_phase = np.r_[np.zeros((1,6)), edge_mode_phase]
 
         print(np.array(sorted(eigvals[:].imag))/2.0/np.pi)
         print(eigvals[:].imag/2.0/np.pi)
-        edge_freq = (eigvals[-2].imag)/2.0/np.pi
+        edge_freq = (eigvals[-4].imag)/2.0/np.pi
 
         return [edge_freq, edge_mode, edge_mode_phase]
 
     def write_mode_shape_to_file(self, filename):
         edge_freq, edge_mode, edge_mode_phase = self.calc_edge_mode()
         N = self.calc_interp_matrix()
+        print(N.shape)
         Nlist = []
         for i in N:
             Nlist.append(i.tolist())
+
 
         yaml_node = {
             'mode': {
@@ -433,7 +435,7 @@ class OpenfastFSI:
 
     def calc_struct_power_edge(self):
 
-        with open('IEA-10.0-198-RWT.BD1.sum.yaml') as f:
+        with open('00_IEA-10.0-198-RWT.BD1.sum.yaml') as f:
             data = list(yaml.load_all(f, Loader=yaml.loader.SafeLoader))[-1]
 
         #All computations below at FEM nodes - not quadrature points
