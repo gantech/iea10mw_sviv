@@ -10,7 +10,7 @@ Time_Integrators:
     second_order_accuracy: true
     start_time: 0
     termination_step_count: 20000
-    time_step: 0.005
+    time_step: 0.0025
     time_step_count: 0
     time_stepping_type: fixed
 linear_solvers:
@@ -125,7 +125,7 @@ realms:
       value: 1.8e-05
     target_name:
     - blade1-HEX
-  mesh: /projects/sviv/ganeshv/mode_shape_oscillation/iea10mw/mesh_blade/iea10mw_blade.exo
+  mesh: ../../mesh/iea10mw_blade.exo
   mesh_transformation:
   - frame: inertial
     mesh_parts:
@@ -186,7 +186,7 @@ realms:
       - 1.0
       - 0.0
       centroid:
-      - 12.097572172848082
+      - 10.0942976185381
       - 0.0
       - 0.0
       type: rotation
@@ -201,7 +201,7 @@ realms:
       - 0.0
       - 1.0
       centroid:
-      - 12.097572172848082
+      - 10.0942976185381
       - 0.0
       - 0.0
       type: rotation
@@ -1159,9 +1159,9 @@ realms:
     nc_file_name: turb_00_output.nc
     t_start: 0.025
     turbine_base_pos:
-    - 12.097572172848082
+    - 10.0942976185381
     - 0.0
-    - -148.73545941424806
+    - -117.944858582168
   name: realm_1
   output:
     output_data_base_name: out01/iea10mw.e
