@@ -32,6 +32,7 @@ export FI_MR_CACHE_MONITOR=memhooks
 export MPICH_SMP_SINGLE_COPY_MODE=NONE
 export FI_CXI_RX_MATCH_MODE=software
 
+export MPICH_OFI_SKIP_NIC_SYMMETRY_TEST=1
 
 cd `sed -n "${SLURM_ARRAY_TASK_ID}p" list_of_cases`
 cd cfd_run
