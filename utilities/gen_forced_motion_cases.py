@@ -5,7 +5,7 @@ import yaml, glob, sys, shutil, subprocess
 from pathlib import Path
 from multiprocessing import Pool
 
-def gen_case(case_data, template_dir='template', case_dir=None):
+def gen_case(case_data, template_dir='template/forced_motion', case_dir=None):
     """Generate a set of Exawind cases to perform power curve
 
     Inputs:
@@ -39,14 +39,10 @@ def gen_case(case_data, template_dir='template', case_dir=None):
     amplitude = case_data['amplitude']
 
     if (case_dir is None):
-        case_dir = 'ws_{:04.1f}_yaw_{:04.1f}_pitch_{:04.1f}_az_{:04.1f}_amp_{:04.1f}/'.format(wspd, yaw, pitch, az, amplitude)
+        case_dir = 'forced_motion/ws_{:04.1f}_yaw_{:04.1f}_pitch_{:04.1f}_az_{:04.1f}_amp_{:04.1f}/'.format(wspd, yaw, pitch, az, amplitude)
 
 
     #First OpenFAST files
-    #Path(case_dir+'openfast_run').mkdir(parents=True, exist_ok=True)
-    # of_files = glob.glob(template_dir+'/openfast_run/*')
-    # for f in of_files:
-    #     dest_file = case_dir+'openfast_run/'+f.split('/')[-1]
     shutil.copytree(Path(template_dir+'/openfast_run'), Path(case_dir+'/openfast_run'))
     subprocess.run(["sed", "-i", "s/PITCH_ANGLE/{}/".format(case_data['pitch']), case_dir+'openfast_run/00_IEA-10.0-198-RWT_ElastoDyn.dat' ])
     subprocess.run(["sed", "-i", "s/YAW_ANGLE/{}/".format(case_data['yaw']), case_dir+'openfast_run/00_IEA-10.0-198-RWT_ElastoDyn.dat' ])
