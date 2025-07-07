@@ -1,0 +1,295 @@
+Simulations:
+- name: sim1
+  optimizer: opt1
+  time_integrator: ti_1
+Time_Integrators:
+- StandardTimeIntegrator:
+    name: ti_1
+    realms:
+    - realm_1
+    second_order_accuracy: true
+    start_time: 0
+    termination_step_count: 605
+    time_step: 0.025
+    time_step_count: 0
+    time_stepping_type: fixed
+linear_solvers:
+- dump_hypre_matrix_stats: false
+  hypre_cfg_file: hypre_file.yaml
+  hypre_cfg_node: hypre_simple_precon
+  kspace: 100
+  max_iterations: 100
+  method: hypre_gmres
+  name: solve_mom
+  output_level: 0
+  preconditioner: boomerAMG
+  recompute_preconditioner_frequency: 1
+  reuse_linear_system: true
+  segregated_solver: true
+  simple_hypre_matrix_assemble: true
+  tolerance: 1e-5
+  type: hypre
+  write_matrix_files: false
+- dump_hypre_matrix_stats: false
+  hypre_cfg_file: hypre_file.yaml
+  hypre_cfg_node: hypre_simple_precon
+  kspace: 100
+  max_iterations: 100
+  method: hypre_gmres
+  name: solve_scalar
+  preconditioner: boomerAMG
+  recompute_preconditioner_frequency: 1
+  reuse_linear_system: true
+  simple_hypre_matrix_assemble: true
+  tolerance: 1e-5
+  type: hypre
+  write_matrix_files: false
+- dump_hypre_matrix_stats: false
+  hypre_cfg_file: hypre_file.yaml
+  hypre_cfg_node: hypre_elliptic
+  kspace: 40
+  max_iterations: 100
+  method: hypre_gmres
+  name: solve_elliptic
+  preconditioner: boomerAMG
+  recompute_preconditioner_frequency: 1
+  reuse_linear_system: true
+  simple_hypre_matrix_assemble: true
+  tolerance: 1e-5
+  type: hypre
+  write_matrix_files: false
+realms:
+- boundary_conditions:
+  - symmetry_boundary_condition: blah
+    target_name: outerBCblade1
+    symmetry_user_data:
+  - target_name: blade1
+    wall_boundary_condition: bc_wall
+    wall_user_data:
+      turbulent_ke: 0.0
+      use_wall_function: false
+
+  check_jacobians: false
+  equation_systems:
+    decoupled_overset_solve: true
+    max_iterations: 0
+    name: theEqSys
+    solver_system_specification:
+      ndtw: solve_elliptic
+      pressure: solve_elliptic
+      specific_dissipation_rate: solve_scalar
+      turbulent_ke: solve_scalar
+      velocity: solve_mom
+    systems:
+    - WallDistance:
+        convergence_tolerance: 1.0e-08
+        exchange_fringe_data: true
+        max_iterations: 1
+        name: myNDTW
+        update_frequency: 1000000000
+    - LowMachEOM:
+        convergence_tolerance: 1e-8
+        max_iterations: 1
+        name: myLowMach
+    - ShearStressTransport:
+        convergence_tolerance: 1e-8
+        max_iterations: 1
+        name: mySST
+  initial_conditions:
+  - constant: ic_1
+    target_name:
+    - blade1-HEX
+    value:
+      pressure: 0
+      specific_dissipation_rate: 1600.0
+      turbulent_ke: 0.24
+      velocity:
+      - 15.0
+      - 0.0
+      - 0.0
+  material_properties:
+    specifications:
+    - name: density
+      type: constant
+      value: 1.225
+    - name: viscosity
+      type: constant
+      value: 1.8e-05
+    target_name:
+    - blade1-HEX
+  mesh: ../../mesh_blade/iea10mw_blade.exo
+  mesh_transformation:
+  - frame: inertial
+    mesh_parts:
+    - blade1-HEX
+    motion:
+    - angle: 90.0
+      axis:
+      - 0.0
+      - 0.0
+      - -1.0
+      centroid:
+      - 0.0
+      - 0.0
+      - 0.0
+      type: rotation
+    name: pitch
+  - frame: inertial
+    mesh_parts:
+    - blade1-HEX
+    motion:
+    - angle: 0.0
+      axis:
+      - 1.0
+      - 0.0
+      - 0.0
+      centroid:
+      - 0.0
+      - 0.0
+      - 0.0
+      type: rotation
+    name: azimuth
+  - frame: inertial
+    mesh_parts:
+    - blade1-HEX
+    motion:
+    - angle: 0.0
+      axis:
+      - 0.0
+      - 1.0
+      - 0.0
+      centroid:
+      - 10.0942976185381
+      - 0.0
+      - 0.0
+      type: rotation
+    name: shaft_tilt
+  - frame: inertial
+    mesh_parts:
+    - blade1-HEX
+    motion:
+    - angle: 00.0
+      axis:
+      - 0.0
+      - 0.0
+      - 1.0
+      centroid:
+      - 10.0942976185381
+      - 0.0
+      - 0.0
+      type: rotation
+    name: yaw
+  openfast_fsi:
+    n_turbines_glob: 1
+    dry_run:  False
+    debug:    False
+    sim_start: init  #/trueRestart/restartDriverInitFAST
+    t_start: 0.0 # one rev
+    t_max: 50.0 # 100 rev
+    n_checkpoint: 1440
+    dt_FAST: 0.001
+    Turbine0:
+      turbine_base_pos: [10.0942976185381, 0.0, -117.944858582168]
+      turbine_hub_pos: [0.0, 0.0, 0.0]
+      FAST_input_filename: "openfast/00_IEA-10.0-198-RWT.fst"
+      sim_type: "ext-loads"
+      blade_parts:
+        - ["blade1-HEX"]
+      blade_boundary_parts:
+        - ["blade1"]
+      az_blend_mean: -10.0
+      az_blend_delta: 1.0
+      vel_mean: 9.1
+      wind_dir: 270.0
+      z_ref: 150.0
+      shear_exp: 0.0
+
+      deflection_ramping:
+        enable_span_ramping: false
+        enable_theta_ramping: false
+        enable_temporal_ramping: false
+        temporal_ramp_start: 0.0
+        temporal_ramp_end: 0.0
+  name: realm_1
+  output:
+    output_data_base_name: out01/iea10mw.e
+    output_frequency: 1
+    output_node_set: false
+    output_variables:
+    - velocity
+    - pressure
+    - turbulent_ke
+    - specific_dissipation_rate
+    - minimum_distance_to_wall
+    - turbulent_viscosity
+    - iblank
+    - iblank_cell
+    - mesh_displacement
+    - q_criterion
+    - vorticity
+    - disp_map
+    - disp_map_interp
+  output_on_failed_jacobian_check: true
+  post_processing:
+  - frequency: 4
+    output_file_name: forces01.dat
+    parameters:
+    - 0
+    - 0
+    - 0
+    physics: surface_force_and_moment
+    target_name:
+    - blade1
+    type: surface
+  restart:
+    restart_data_base_name: rst01/iea10mw.rst
+    restart_frequency: 1440
+    restart_start: 0
+  solution_options:
+    name: myOptions
+    options:
+    - source_terms:
+        continuity: density_time_derivative
+    - hybrid_factor:
+        specific_dissipation_rate: 1.0
+        turbulent_ke: 1.0
+        velocity: 1.0
+    - alpha_upw:
+        specific_dissipation_rate: 1.0
+        turbulent_ke: 1.0
+        velocity: 1.0
+    - upw_factor:
+        specific_dissipation_rate: 0.0
+        turbulent_ke: 0.0
+        velocity: 1.0
+    - noc_correction:
+        pressure: true
+    - limiter:
+        pressure: false
+        specific_dissipation_rate: true
+        turbulent_ke: true
+        velocity: true
+    - projected_nodal_gradient:
+        ndtw: element
+        pressure: element
+        specific_dissipation_rate: element
+        turbulent_ke: element
+        velocity: element
+    - relaxation_factor:
+        pressure: 0.3
+        specific_dissipation_rate: 0.7
+        turbulent_ke: 0.7
+        velocity: 0.7
+    projected_timescale_type: momentum_diag_inv
+    turbulence_model: sst
+  turbulence_averaging:
+    specifications:
+    - compute_q_criterion: true
+      compute_vorticity: true
+      name: one
+      reynolds_averaged_variables:
+      - velocity
+      target_name:
+      - blade1-HEX
+    time_filter_interval: 100000.0
+  use_edges: true
