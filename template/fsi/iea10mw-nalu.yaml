@@ -125,7 +125,7 @@ realms:
       value: 1.8e-05
     target_name:
     - blade1-HEX
-  mesh: ../../mesh/iea10mw_blade.exo
+  mesh: ../mesh/iea10mw_blade.exo
   mesh_transformation:
   - frame: inertial
     mesh_parts:
