@@ -8,7 +8,7 @@ This will only work on the NREL Kestrel system as of the date of this commit 02/
 
 Steps to run this
 
-1. From the top level folder `python utilities/gen_cases.py`
-2. From the top level folder `sbatch run_openfast.slurm`
-3. From the top level fodler `sbatch run_sviv.slurm`
+1. From the top level folder `python utilities/gen_forced_motion_cases.py`
+2. From the `forced_motion` folder `sbatch run_openfast.slurm`
+3. From the `forced_motion` folder `sbatch run_sviv.slurm`
 
