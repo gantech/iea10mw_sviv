@@ -161,8 +161,6 @@ class OpenfastFSI:
             #                                bld_root_ref_frame, -1)
             # self.bld_orient_rotation[b,:,i] = compose(self.hub_orient[it,:], bld_root_final_frame)
 
-            print(self.bld_orient[it,b,:,i], ' ', self.bld_ref_orient[b,:,i])
-
 
     def get_blade_deflection(self, it):
         """Get deflections only due to blade displacement
@@ -370,9 +368,9 @@ class OpenfastFSI:
 
         return np.c_[qp_u, qp_r]
 
-    def calc_edge_mode(self):
+    def calc_mode(self, idx):
 
-        """Calculate edge mode """
+        """Calculate mode freq, shape and phase """
 
         with open('IEA-10.0-198-RWT.BD1.sum.yaml') as f:
             data = list(yaml.load_all(f, Loader=yaml.loader.SafeLoader))[-1]
@@ -386,22 +384,21 @@ class OpenfastFSI:
         #First edge mode is at location -4
 
         #Get first edge mode scaled to 1m displacement in edge direction
-        edge_mode = np.abs(eigvecs[:60,-4].reshape((10,6))) * 1.0 / np.abs(eigvecs[60-5,-4])
-        edge_mode = np.r_[np.zeros((1,6)), edge_mode]
+        mode = np.abs(eigvecs[:60,idx].reshape((10,6))) * 1.0 / np.abs(eigvecs[60-5,idx])
+        mode = np.r_[np.zeros((1,6)), mode]
 
-        edge_mode_phase = np.angle(eigvecs[:60,-4].reshape((10,6)))
-        edge_mode_phase = np.r_[np.zeros((1,6)), edge_mode_phase]
+        mode_phase = np.angle(eigvecs[:60,idx].reshape((10,6)))
+        mode_phase = np.r_[np.zeros((1,6)), mode_phase]
 
         print(np.array(sorted(eigvals[:].imag))/2.0/np.pi)
         print(eigvals[:].imag/2.0/np.pi)
-        edge_freq = (eigvals[-4].imag)/2.0/np.pi
+        freq = (eigvals[idx].imag)/2.0/np.pi
 
-        return [edge_freq, edge_mode, edge_mode_phase]
+        return [freq, mode, mode_phase]
 
-    def write_mode_shape_to_file(self, filename):
-        edge_freq, edge_mode, edge_mode_phase = self.calc_edge_mode()
+    def write_mode_shape_to_file(self, filename, idx):
+        freq, mode, mode_phase = self.calc_mode(idx)
         N = self.calc_interp_matrix()
-        print(N.shape)
         Nlist = []
         for i in N:
             Nlist.append(i.tolist())
@@ -409,9 +406,9 @@ class OpenfastFSI:
 
         yaml_node = {
             'mode': {
-                'freq': float(edge_freq),
-                'shape': edge_mode.tolist(),
-                'phase': edge_mode_phase.tolist(),
+                'freq': float(freq),
+                'shape': mode.tolist(),
+                'phase': mode_phase.tolist(),
                 'interp_matrix': Nlist
             }
         }
@@ -590,4 +587,5 @@ if __name__=="__main__":
     #of_fsi.convert_xdot_to_xdot_omega()
 
     #of_fsi.viz_edgewise_modeshape()
-    of_fsi.write_mode_shape_to_file('edge_mode.yaml')
+    of_fsi.write_mode_shape_to_file('edge_mode.yaml', -4)
+    of_fsi.write_mode_shape_to_file('flap_mode.yaml', -2)
