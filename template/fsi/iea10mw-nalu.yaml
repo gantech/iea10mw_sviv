@@ -215,6 +215,10 @@ realms:
     t_max: 50.0 # 100 rev
     n_checkpoint: 1440
     dt_FAST: 0.001
+    edge_ramp_force: 2.0e3
+    edge_ramp_sinusoid: 1.0
+    edge_force_offramp_start: 10.0
+    edge_force_offramp_end: 11.0
     Turbine0:
       turbine_base_pos: [10.0942976185381, 0.0, -117.944858582168]
       turbine_hub_pos: [0.0, 0.0, 0.0]
