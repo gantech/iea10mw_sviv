@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import yaml, glob, sys, shutil, subprocess
+import os
 from pathlib import Path
 from multiprocessing import Pool
 
@@ -36,9 +37,11 @@ def gen_case(case_data, template_dir='template/fsi', case_dir=None):
     yaw = case_data['yaw']
     az = case_data['azimuth']
     pitch = case_data['pitch']
+    timestep = case_data['timestep']
 
     if (case_dir is None):
-        case_dir = 'fsi_cases/ws_{:04.1f}_yaw_{:04.1f}_pitch_{:04.1f}_az_{:04.1f}/'.format(wspd, yaw, pitch, az)
+        case_dir = 'ws_{:04.1f}_yaw_{:04.1f}_pitch_{:04.1f}_az_{:04.1f}_timestep_{:06.4f}/'.format(wspd, yaw, pitch, az, timestep)
+        #case_dir = 'fsi_cases/ws_{:04.1f}_yaw_{:04.1f}_pitch_{:04.1f}_az_{:04.1f}/'.format(wspd, yaw, pitch, az)
 
     Path(case_dir).mkdir(parents=True, exist_ok=True)
 
@@ -63,6 +66,8 @@ def gen_case(case_data, template_dir='template/fsi', case_dir=None):
         nif['realms'][0]['mesh_transformation'][3]['motion'][0]['angle'] = az #Azimuth
         nif['realms'][0]['mesh_transformation'][5]['motion'][0]['angle'] = yaw #Yaw
 
+        nif['Time_Integrators'][0]['StandardTimeIntegrator']['time_step'] = timestep
+
         yaml.dump(nif, open(case_dir+'/iea10mw-nalu.yaml','w'), default_flow_style=False)
 
 
@@ -70,25 +75,47 @@ def gen_case(case_data, template_dir='template/fsi', case_dir=None):
 
     amrwind_inp_file = Path(template_dir+'/iea10mw-amr.inp')
     shutil.copy(amrwind_inp_file, Path(case_dir+'/iea10mw-amr.inp'))
-    subprocess.run(["sed", "-i", "s/WIND_SPEED/{}/".format(case_data['wspd']), case_dir+'/iea10mw-amr.inp' ])
+    #subprocess.run(["sed", "-i", "s/WIND_SPEED/{}/".format(case_data['wspd']), case_dir+'/iea10mw-amr.inp' ])
+    subprocess.run(["sed", "-i", 
+                "-e", "s/WIND_SPEED/{}/".format(case_data['wspd']),
+                "-e", "s/Time_Step/{}/".format(case_data['timestep']),
+                case_dir+'/iea10mw-amr.inp'])
 
     exawind_inp_file = Path((template_dir+'/iea10mw.yaml'))
     shutil.copy(exawind_inp_file, Path(case_dir+'/iea10mw.yaml'))
     refinement_box_file = Path(template_dir+'/static_box.txt')
     shutil.copy(refinement_box_file, Path(case_dir+'/static_box.txt'))
 
+        # === Replace Time_Step_OpenFAST ===
+    fst_file_path = Path(case_dir) / 'openfast' / '00_IEA-10.0-198-RWT.fst'
+    if fst_file_path.exists():
+        timestep_of = timestep / 2
+        subprocess.run(["sed", "-i", "s/Time_Step_OpenFAST/{:.6f}/".format(timestep_of), str(fst_file_path)])
+    else:
+        print(f"Warning: {fst_file_path} not found. Skipped Time_Step_OpenFAST replacement.")
+
+
 if __name__=="__main__":
 
     case_list = yaml.load(open('case_list.yaml'), Loader=yaml.UnsafeLoader)['siv_viv_cases']
     cases = []
     for yc in case_list:
-        cases.append( {'wspd': float(yc['ws']),
-                       'yaw': float(yc['yaw']),
-                       'pitch': float(yc['pitch']),
-                       'azimuth': yc['az']} )
+        for timestep in yc['timestep']:
+            cases.append( {'wspd': float(yc['ws']),
+                           'yaw': float(yc['yaw']),
+                           'pitch': float(yc['pitch']),
+                           'azimuth': yc['az'],
+                           'timestep': float(timestep)
+                           } )
     print(cases)
     for c in cases:
         gen_case(c)
 
     # with Pool(36) as p:
     #     p.map(gen_case, cases)
+
+    ws_folders = glob.glob('ws*/')
+    with open('list_of_cases', 'w') as f:
+        for folder in ws_folders:
+            folder_name = os.path.basename(folder.rstrip('/'))
+            f.write(folder_name + '\n')  

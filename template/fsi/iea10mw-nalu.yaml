@@ -125,7 +125,7 @@ realms:
       value: 1.8e-05
     target_name:
     - blade1-HEX
-  mesh: ../mesh/iea10mw_blade.exo
+  mesh: /scratch/xuepengfu/iea10mw_grid_testv1/chord_193_span_12/mesh/blade_volume.exo
   mesh_transformation:
   - frame: inertial
     mesh_parts:
@@ -212,7 +212,7 @@ realms:
     debug:    False
     sim_start: init  #/trueRestart/restartDriverInitFAST
     t_start: 0.0 # one rev
-    t_max: 50.0 # 100 rev
+    t_max: 200.0 # 100 rev
     n_checkpoint: 1440
     dt_FAST: 0.001
     edge_ramp_force: 2.0e3
