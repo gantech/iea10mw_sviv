@@ -3,7 +3,7 @@ exawind:
   nalu_wind_inp:
     - iea10mw-nalu.yaml
   amr_wind_inp: iea10mw-amr.inp
-  num_timesteps: 18000
+  num_timesteps: TOTAL_TIMESTEPS
   nonlinear_iterations: 1
 
   # Variables for overset exchange

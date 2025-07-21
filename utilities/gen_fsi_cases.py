@@ -70,8 +70,18 @@ def gen_case(case_data, template_dir='template/fsi', case_dir=None):
 
         yaml.dump(nif, open(case_dir+'/iea10mw-nalu.yaml','w'), default_flow_style=False)
 
-
     shutil.copy( Path(template_dir+'/hypre_file.yaml'), Path(case_dir+'/hypre_file.yaml') )
+
+    exawind_yaml_file = Path(template_dir + '/iea10mw.yaml')
+    with open(exawind_yaml_file, 'r') as f:
+        content = f.read()
+
+    num_timesteps = int(round(250 / timestep))
+    content = content.replace('TOTAL_TIMESTEPS', str(num_timesteps))
+
+    with open(case_dir + '/iea10mw.yaml', 'w') as f:
+        f.write(content)
+
 
     amrwind_inp_file = Path(template_dir+'/iea10mw-amr.inp')
     shutil.copy(amrwind_inp_file, Path(case_dir+'/iea10mw-amr.inp'))
@@ -81,8 +91,6 @@ def gen_case(case_data, template_dir='template/fsi', case_dir=None):
                 "-e", "s/Time_Step/{}/".format(case_data['timestep']),
                 case_dir+'/iea10mw-amr.inp'])
 
-    exawind_inp_file = Path((template_dir+'/iea10mw.yaml'))
-    shutil.copy(exawind_inp_file, Path(case_dir+'/iea10mw.yaml'))
     refinement_box_file = Path(template_dir+'/static_box.txt')
     shutil.copy(refinement_box_file, Path(case_dir+'/static_box.txt'))
 
