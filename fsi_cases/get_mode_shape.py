@@ -105,9 +105,7 @@ ntsteps = np.shape(bld_orient)[0]
 n_fenodes = np.shape(bld_orient)[2]
 for it in range(peaks[-5],peaks[-1]):
     for inode in range(n_fenodes):
-        final_pos = bld_disp[it,:,inode] + bld_ref_pos[:,inode]
-        disp_bld_root = applyWM(bld_root_orient, final_pos) - bld_ref_pos[:, inode]
-        bld_disp[it,:,inode] = disp_bld_root
+        bld_disp[it,:,inode] = applyWM(bld_root_orient, bld_disp[it,:,inode])
 
 bld_disp[peaks[-5]:peaks[-1],0,:] = bld_disp[peaks[-5]:peaks[-1],0,:] - np.mean(bld_disp[peaks[-5]:peaks[-1], 0, :], axis=0)
 bld_disp[peaks[-5]:peaks[-1],1,:] = bld_disp[peaks[-5]:peaks[-1],1,:] - np.mean(bld_disp[peaks[-5]:peaks[-1], 1, :], axis=0)
